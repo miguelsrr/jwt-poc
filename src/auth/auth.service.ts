@@ -33,9 +33,9 @@ export class AuthService {
     });
     const { iat } = this.jwtService.decode(access_token) as any;
     await this.userRepo.query(
-      `UPDATE "user" SET "jwtIds" = "jwtIds" || '${
+      `UPDATE "user" SET "jwtIds" = array_append("jwtIds", '${
         iat + id
-      }'::text WHERE "id" = '${id}'`,
+      }') WHERE "id" = '${id}'`,
     );
     return {
       access_token,
@@ -45,9 +45,9 @@ export class AuthService {
   async removePreviousJwtId(payload) {
     const { iat, sub } = this.jwtService.decode(payload) as any;
     await this.userRepo.query(
-      `UPDATE "user" SET "jwtIds" = array_remove("jwtIds", ${
+      `UPDATE "user" SET "jwtIds" = array_remove("jwtIds", '${
         iat + sub
-      }::text) WHERE "id" = '${sub}'`,
+      }') WHERE "id" = '${sub}'`,
     );
   }
 }
